@@ -2,7 +2,7 @@
 Various scripts I've made over the years to find performance bottle necks in garrysmod.
 
 ## Installation
-Either clone/download the repository or run the individual files, the files can run all by themselves.
+Either clone/download the repository and put it in your `addons/` folder or run the individual files, the files are designed to be able to be ran by themselves.
 
 ## Usage
 | File | Commands | Description |
