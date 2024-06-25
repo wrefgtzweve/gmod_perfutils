@@ -42,11 +42,13 @@ concommand.Add( cmd, function( ply, _, args )
         table.sort( indexed, function( a, b ) return a.count > b.count end )
 
         local max = 100
+        local max_count = indexed[1].count
+
         for _, data in ipairs( indexed ) do
             max = max - 1
             if max < 0 then break end
 
-            print( data.count, data.origin )
+            MsgC( Color( 255, 255 - ( data.count / max_count * 255 ), 0 ), data.count, color_white, " | ", data.origin, "\n" )
         end
 
         if CLIENT then
