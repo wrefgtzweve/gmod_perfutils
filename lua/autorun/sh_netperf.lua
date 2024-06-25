@@ -28,13 +28,24 @@ local function applyWrap()
     end
 end
 
+local nw2Table = {}
+hook.Add( "EntityNetworkedVarChanged", "NetPerf", function( ent, name, oldval, newval )
+    if not running then return end
+
+    nw2Table[name] = ( nw2Table[name] or 0 ) + 1
+end )
+
 concommand.Add( SERVER and "red_sv_netperf_start" or "red_cl_netperf_start", function( ply )
     if SERVER and IsValid( ply ) then return end
 
-    print( "Netperf started" )
-    running = true
     totalStartTime = SysTime()
+    table.Empty( perfTable )
+    table.Empty( bitTable )
+    table.Empty( nw2Table )
+
     applyWrap()
+    running = true
+    print( "Netperf started" )
 end )
 
 concommand.Add( SERVER and "red_sv_netperf_stop" or "red_cl_netperf_stop", function( ply )
@@ -46,23 +57,27 @@ concommand.Add( SERVER and "red_sv_netperf_stop" or "red_cl_netperf_stop", funct
     end
 
     running = false
-    print( "Netperf results:\n" )
-    print( "Sorted by time:\n" )
+    print( "Netperf netresults:\n" )
+    print( "Netmessages Sorted by time:\n" )
 
     local perfstr = ""
     for k, v in SortedPairsByValue( perfTable, true ) do
         perfstr = perfstr .. k .. " - " .. v .. "s - " .. bitTable[k] .. " bits\n"
     end
-
     print( perfstr )
-    print( "Sorted by bits:\n" )
 
+    print( "Netmessages Sorted by bits:\n" )
     local bitstr = ""
     for k, v in SortedPairsByValue( bitTable, true ) do
         bitstr = bitstr .. k .. " - " .. v .. " bits - " .. perfTable[k] .. "s\n"
     end
-
     print( bitstr )
+
+    print( "NW2 Sorted by count:\n" )
+    for k, v in SortedPairsByValue( nw2Table, true ) do
+        print( "NW2: " .. k .. " - " .. v .. " times" )
+    end
+
     print( "Time ran: " .. ( SysTime() - totalStartTime ) .. "s" )
 
     net.Incoming = netperf_net_Incoming
