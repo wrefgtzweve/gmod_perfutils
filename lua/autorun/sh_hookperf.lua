@@ -10,7 +10,7 @@ local function printer( ... )
     local order = {}
     for i, txt in pairs( { ... } ) do
         table.insert( order, colors[i] )
-        table.insert( order, txt .. " " )
+        table.insert( order, tostring( txt ) .. " " )
     end
 
     table.insert( order, "\n" )
