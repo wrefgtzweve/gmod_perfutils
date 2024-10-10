@@ -11,6 +11,7 @@ Either clone/download the repository and put it in your `addons/` folder or run 
 | `sh_hookorder.lua` | `red_sv_hookorder` `red_cl_hookorder` | This script will print out the order in which hooks are called. This can be useful to determine if a hook is returning early and preventing other hooks from being called. Also shows the time taken to run each hook.
 `sh_netperf.lua` | `red_sv_netperf_start` `red_cl_netperf_start` `red_sv_netperf_stop` `red_cl_netperf_stop` | This script will detour all net receivers log the amount of bytes received and the time taken to process the message. This can be useful to reduce networking load on both server and client.
 | `sh_indexcounter.lua` | `red_sv_indexcounter` `red_cl_indexcounter` | This script will count the amount of __index metamethod calls on entities. The more the worse, entity indexing is significiantly slower than using the entity table directly (ent:GetTable()).
+| `sh_net_logger.lua` | `red_(sv/cl)_netlogger_start` `red_(sv/cl)_netlogger_stop`  `red_(sv/cl)_netlogger_ignore` | Starts the netlogger, all incomming net.* functions will be printed to console in order as they're being read. Spammy net messages can be ignored using `red_(sv/cl)_netlogger_ignore netmsgname` |
 | `sv_net_dumper.lua` | `red_sv_netdump` | This script will find all `net.Receive` function origins and dump their files to the data folder. This can be useful for locating badly performing hooks and exploits. |
 
 ## Extra tools
