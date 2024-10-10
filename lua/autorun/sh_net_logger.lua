@@ -80,6 +80,8 @@ local function applyWrap()
 end
 
 concommand.Add( SERVER and "red_sv_netlogger_start" or "red_cl_netlogger_start", function( ply )
+    if SERVER and IsValid( ply ) then return end
+
     applyWrap()
     running = true
     print( "Netlogger started" )
