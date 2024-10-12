@@ -23,6 +23,12 @@ local netReaders = {
 local ignoreNets = { wire_overlay_data = true }
 net._ReadTable = net._ReadTable or net.ReadTable
 
+local white = Color( 255, 255, 255 )
+local startColor = Color( 0, 255, 0 )
+local endColor = Color( 255, 0, 0 )
+local blueColor = Color( 166, 190, 255 )
+local realmColor = CLIENT and Color( 255, 200, 0 ) or Color( 0, 200, 255 )
+
 local function wrapNetRead()
     function net.ReadTable()
         print( "NET: START net.ReadTable" )
@@ -37,7 +43,19 @@ local function wrapNetRead()
         net[reader] = function( ... )
             local args = { ... }
             local res = oldFunc( ... )
-            print( "NET: net." .. reader .. " " .. table.concat( args, ", " ) .. " = " .. tostring( res ) )
+            if #args ~= 0 then
+                local argStr = ""
+                for i, arg in ipairs( args ) do
+                    argStr = argStr .. tostring( arg )
+                    if i ~= #args then
+                        argStr = argStr .. ", "
+                    end
+                end
+
+                MsgC( "    net." .. reader, "(", argStr, ")", white, ": ", blueColor, tostring( res ), "\n" )
+            else
+                MsgC( "    net." .. reader, white, ": ", blueColor, tostring( res ), "\n" )
+            end
             return res
         end
     end
@@ -66,12 +84,16 @@ local function applyWrap()
         end
 
         if not ignoreNets[strName] then
-            print( "NET START: " .. strName )
+            MsgC( startColor, "NET START: ", realmColor, strName, blueColor, " (" .. len .. " bytes)", "\n" )
             wrapNetRead()
         end
-        net_Incoming( len, client )
+
+        local sysTime = SysTime()
+        ProtectedCall( net_Incoming, len, client )
+        local took = SysTime() - sysTime
+
         if not ignoreNets[strName] then
-            print( "NET END: " .. strName )
+            MsgC( endColor, "NET END: ", realmColor, strName, blueColor, " (" .. string.format( "%.4f", took * 1000 ) .. "ms)", "\n\n" )
             unwrapNetRead()
         end
 
