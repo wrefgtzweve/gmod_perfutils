@@ -22,3 +22,4 @@ Tools i often use and can recommend for performance profiling.
 | [FProfiler](https://github.com/FPtje/FProfiler)  | A tool that can be used to profile lua code. It can be used to find performance bottlenecks in your code after you've determined them being an issue with +showbudget or +showvprof.  |
 | concmd `+showbudget` | Shows the budget panel in the top right corner of the screen. This shows how long each frame is taking to render, super useful as the first step in finding performance issues. This isn't limited to lua either which is a big bonus.  |
 | concmd `+showvprof` | Shows the vprof panel, has detailed information about costs. |
+| convar `phys_speeds 1` | Shows the amount of time it took per tick to execute see [here](https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/mp/src/game/server/physics.cpp#L1697) for the source. |
