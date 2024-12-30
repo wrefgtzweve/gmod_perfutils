@@ -17,6 +17,10 @@ local function wrapHooks( hookTable, hookName, hookCount )
         local wrappedHook = function( ... )
             hookRanNum = hookRanNum + 1
 
+            if hookRanNum == 1 then
+                print( ... )
+            end
+
             local startTime = SysTime()
             local a, b, c, d, e, f = originalFunc( ... )
             local timeTook = SysTime() - startTime
