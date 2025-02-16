@@ -36,7 +36,9 @@ hook.Add( "EntityNetworkedVarChanged", "NetPerf", function( ent, name, oldval, n
 end )
 
 concommand.Add( SERVER and "red_sv_netperf_start" or "red_cl_netperf_start", function( ply )
-    if SERVER and IsValid( ply ) then return end
+    if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
+        return MsgC( pink, "No permission.\n" )
+    end
 
     totalStartTime = SysTime()
     table.Empty( perfTable )
@@ -49,7 +51,9 @@ concommand.Add( SERVER and "red_sv_netperf_start" or "red_cl_netperf_start", fun
 end )
 
 concommand.Add( SERVER and "red_sv_netperf_stop" or "red_cl_netperf_stop", function( ply )
-    if SERVER and IsValid( ply ) then return end
+    if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
+        return MsgC( pink, "No permission.\n" )
+    end
 
     if not running then
         print( "Netperf isn't running." )
