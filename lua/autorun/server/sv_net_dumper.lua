@@ -1,5 +1,7 @@
 concommand.Add( "red_sv_netdump", function( ply )
-    if IsValid( ply ) then return end
+    if IsValid( ply ) and not ply:IsSuperAdmin() then
+        return ply:ChatPrint("No permission.")
+    end
 
     if file.Exists( "netdump", "DATA" ) then
         for _, fil in ipairs( file.Find( "netdump/*", "DATA" ) ) do
