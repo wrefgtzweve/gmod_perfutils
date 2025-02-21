@@ -37,7 +37,7 @@ end )
 
 concommand.Add( SERVER and "red_sv_netperf_start" or "red_cl_netperf_start", function( ply )
     if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
-        return MsgC( pink, "No permission.\n" )
+        return ply:ChatPrint("No permission.")
     end
 
     totalStartTime = SysTime()
@@ -52,7 +52,7 @@ end )
 
 concommand.Add( SERVER and "red_sv_netperf_stop" or "red_cl_netperf_stop", function( ply )
     if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
-        return MsgC( pink, "No permission.\n" )
+        return ply:ChatPrint("No permission.")
     end
 
     if not running then

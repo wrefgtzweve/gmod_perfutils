@@ -103,7 +103,7 @@ end
 
 concommand.Add( SERVER and "red_sv_netlogger_start" or "red_cl_netlogger_start", function( ply )
     if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
-        return MsgC( pink, "No permission.\n" )
+        return ply:ChatPrint("No permission.")
     end
 
     applyWrap()
@@ -113,7 +113,7 @@ end )
 
 concommand.Add( SERVER and "red_sv_netlogger_stop" or "red_cl_netlogger_stop", function( ply )
     if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
-        return MsgC( pink, "No permission.\n" )
+        return ply:ChatPrint("No permission.")
     end
 
     if not running then
@@ -127,7 +127,7 @@ end )
 
 concommand.Add( SERVER and "red_sv_netlogger_ignore" or "red_cl_netlogger_ignore", function( ply, _, args )
     if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
-        return MsgC( pink, "No permission.\n" )
+        return ply:ChatPrint("No permission.")
     end
 
     if not running then

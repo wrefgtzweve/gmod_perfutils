@@ -1,6 +1,6 @@
 concommand.Add( "red_sv_netdump", function( ply )
     if IsValid( ply ) and not ply:IsSuperAdmin() then
-        return MsgC( pink, "No permission.\n" )
+        return ply:ChatPrint("No permission.")
     end
 
     if file.Exists( "netdump", "DATA" ) then

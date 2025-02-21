@@ -49,7 +49,7 @@ end
 
 concommand.Add( SERVER and "red_sv_hookorder" or "red_cl_hookorder", function( ply, _, _, str )
     if IsValid( ply ) and not ply:IsSuperAdmin() then
-        return MsgC( pink, "No permission.\n" )
+        return ply:ChatPrint("No permission.")
     end
 
     local hookTable = hook.GetTable()
