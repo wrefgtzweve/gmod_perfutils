@@ -23,16 +23,22 @@ concommand.Add( cmd, function( ply, _, args )
     if SERVER and IsValid( ply ) then return end
     local time = tonumber( args[1] ) or 10
 
+    if HOOK_PERF_RUNNING then
+        MsgC( softWhite, "Hook performance profiler is already running.\n" )
+        return
+    end
+
     local lagTbl = {}
     HOOK_PERF_ORIGINALS = HOOK_PERF_ORIGINALS or {}
+    HOOK_PERF_RUNNING = true
 
     for hookName, hookTable in pairs( hook.GetTable() ) do
         for hookEvent, hookFunc in pairs( hookTable ) do
             HOOK_PERF_ORIGINALS[hookName] = HOOK_PERF_ORIGINALS[hookName] or {}
-            HOOK_PERF_ORIGINALS[hookName][hookEvent] = hookFunc
+            HOOK_PERF_ORIGINALS[hookName][hookEvent] = HOOK_PERF_ORIGINALS[hookName][hookEvent] or hookFunc
 
-            local hookFunc = hookFunc
-            local originInfo = debug.getinfo( hookFunc, "S" )
+            local originalFunc = HOOK_PERF_ORIGINALS[hookName][hookEvent]
+            local originInfo = debug.getinfo( originalFunc, "S" )
             local hookFuncOrigin = originInfo.short_src
             local hookFuncLastDefined = originInfo.lastlinedefined
 
@@ -45,7 +51,7 @@ concommand.Add( cmd, function( ply, _, args )
                 info.count = info.count + 1
 
                 local sysTime = SysTime()
-                local a, b, c, d, e, f = hookFunc( ... )
+                local a, b, c, d, e, f = originalFunc( ... )
                 lagTbl[hookEvent].time = lagTbl[hookEvent].time + SysTime() - sysTime
 
                 return a, b, c, d, e, f
@@ -57,7 +63,7 @@ concommand.Add( cmd, function( ply, _, args )
 
     timer.Simple( time, function()
         -- restore
-        for hookName, hookTable in ipairs( hook.GetTable() ) do
+        for hookName, hookTable in pairs( hook.GetTable() ) do
             for hookEvent in pairs( hookTable ) do
                 hook.Remove( hookName, hookEvent )
                 hook.Add( hookName, hookEvent, HOOK_PERF_ORIGINALS[hookName][hookEvent] )
@@ -84,5 +90,6 @@ concommand.Add( cmd, function( ply, _, args )
         end
 
         HOOK_PERF_ORIGINALS = nil
+        HOOK_PERF_RUNNING = nil
     end )
 end )
