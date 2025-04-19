@@ -20,7 +20,10 @@ end
 
 local cmd = SERVER and "red_sv_hookperf" or "red_cl_hookperf"
 concommand.Add( cmd, function( ply, _, args )
-    if SERVER and IsValid( ply ) then return end
+    if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
+        return ply:ChatPrint("No permission.")
+    end
+
     local time = tonumber( args[1] ) or 10
 
     if HOOK_PERF_RUNNING then
