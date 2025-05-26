@@ -1,15 +1,17 @@
-concommand.Add( "red_sv_netdump", function( ply )
+concommand.Add( SERVER and "red_sv_netdump" or "red_cl_netdump", function( ply )
     if IsValid( ply ) and not ply:IsSuperAdmin() then
         return ply:ChatPrint("No permission.")
     end
 
-    if file.Exists( "netdump", "DATA" ) then
+    local folder = SERVER and "netdump_sv" or "netdump_cl"
+
+    if file.Exists( folder, "DATA" ) then
         for _, fil in ipairs( file.Find( "netdump/*", "DATA" ) ) do
-            file.Delete( "netdump/" .. fil )
+            file.Delete( folder .. "/" .. fil )
         end
-        file.Delete( "netdump" )
+        file.Delete( folder )
     end
-    file.CreateDir( "netdump" )
+    file.CreateDir( folder )
 
     for name, func in pairs( net.Receivers ) do
         local info = debug.getinfo( func, "S" )
@@ -46,7 +48,7 @@ concommand.Add( "red_sv_netdump", function( ply )
                     dump = dump .. line .. "\n"
                 end
 
-                file.Write( "netdump/" .. name .. ".txt", dump )
+                file.Write( folder .. "/" .. name .. ".txt", dump )
                 print( "[NETDUMP] Dumped:", name, " - ", source )
             end )
         end
