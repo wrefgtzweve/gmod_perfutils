@@ -48,7 +48,7 @@ concommand.Add( cmd, function( ply, _, args )
             local function wrapper( ... )
                 local info = lagTbl[hookEvent]
                 if not info then
-                    info = { count = 0, time = 0, hook = hookName, origin = hookFuncOrigin, lastDefined = hookFuncLastDefined }
+                    info = { count = 0, time = 0, hook = hookName, origin = hookFuncOrigin, lastDefined = hookFuncLastDefined, isGM = false }
                     lagTbl[hookEvent] = info
                 end
                 info.count = info.count + 1
@@ -64,6 +64,32 @@ concommand.Add( cmd, function( ply, _, args )
         end
     end
 
+    local GM = GAMEMODE or GM
+    GM_ORIGINALS = GM_ORIGINALS or {}
+    for methodName, func in pairs( GM ) do
+        if isfunction( func ) then
+            GM_ORIGINALS[methodName] = GM_ORIGINALS[methodName] or func
+            local original = GM_ORIGINALS[methodName]
+            local originInfo = debug.getinfo( original, "S" )
+
+            local function detour( ... )
+                local startTime = SysTime()
+                local a, b, c, d, e, f = original( ... )
+
+                local info = lagTbl[methodName]
+                if not info then
+                    info = { count = 0, time = 0, hook = "GM:" .. methodName, origin = originInfo.short_src, lastDefined = originInfo.lastlinedefined, isGM = true }
+                    lagTbl[methodName] = info
+                end
+
+                lagTbl[methodName].time = lagTbl[methodName].time + SysTime() - startTime
+                return a, b, c, d, e, f
+            end
+
+            GM[methodName] = detour
+        end
+    end
+
     timer.Simple( time, function()
         -- restore
         for hookName, hookTable in pairs( hook.GetTable() ) do
@@ -71,6 +97,10 @@ concommand.Add( cmd, function( ply, _, args )
                 hook.Remove( hookName, hookEvent )
                 hook.Add( hookName, hookEvent, HOOK_PERF_ORIGINALS[hookName][hookEvent] )
             end
+        end
+
+        for methodName, func in pairs( GM_ORIGINALS ) do
+            GM[methodName] = func
         end
 
         -- sort
@@ -84,12 +114,12 @@ concommand.Add( cmd, function( ply, _, args )
         end )
 
         MsgC( softWhite, "Laggy hooks:\n" )
-        printer( "Hook name", "Hook", "Time", "Count", "Origin", "Line defined" )
+        printer( "Name", "Hook", "Time", "Count", "Origin", "Line defined" )
         for i = 1, 100 do
             local v = sorted[i]
             if not v then break end
 
-            printer( v[1], v[2].hook, v[2].time, v[2].count, v[2].origin, v[2].lastDefined )
+            printer( ( v[2].isGM and "GM:" or "" ) .. v[1], v[2].hook, v[2].time, v[2].count, v[2].origin, v[2].lastDefined )
         end
 
         HOOK_PERF_ORIGINALS = nil
