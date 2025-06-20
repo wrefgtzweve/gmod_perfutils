@@ -92,14 +92,23 @@ concommand.Add( cmd, function( ply, _, args )
 
     timer.Simple( time, function()
         -- restore
-        for hookName, hookTable in pairs( hook.GetTable() ) do
+        local allHooks = hook.GetTable()
+        for hookName, hookTable in pairs( allHooks ) do
             for hookEvent in pairs( hookTable ) do
+                if not allHooks[hookName] or not allHooks[hookName][hookEvent] then
+                    continue
+                end
+
                 hook.Remove( hookName, hookEvent )
                 hook.Add( hookName, hookEvent, HOOK_PERF_ORIGINALS[hookName][hookEvent] )
             end
         end
 
         for methodName, func in pairs( GM_ORIGINALS ) do
+            if not GM[methodName] then
+                continue
+            end
+
             GM[methodName] = func
         end
 
