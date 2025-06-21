@@ -75,11 +75,11 @@ concommand.Add( cmd, function( ply, _, args )
         end )
 
         print( "Sent performance profiler results:" )
-        print( "Class\tCount\tTime\tOrigin\tLast Defined" )
+        print( "Class\tCount\tTime (seconds)\tOrigin\tLast Defined" )
         for i = 1, 100 do
             local sort = sorted[i]
             if sort then
-                print( sort.class, sort.varName, sort.count, sort.time, sort.origin, sort.lastDefined )
+                print( sort.class, sort.varName, sort.count, sort.time, sort.origin .. ":" .. sort.lastDefined )
             end
         end
 
