@@ -51,6 +51,7 @@ concommand.Add( cmd, function( ply, _, args )
     end
 
     local time = tonumber( args[1] ) or 10
+    local startTime = SysTime()
     timer.Simple( time, function()
         if CLIENT then
             chat.AddText( "Sent performance profiler finished." )
@@ -74,7 +75,9 @@ concommand.Add( cmd, function( ply, _, args )
             return a.time > b.time
         end )
 
-        print( "Sent performance profiler results:" )
+        local endTime = SysTime()
+        local runTime = math.Round( endTime - startTime, 2 )
+        print( "Sent profiler ran for " .. runTime .. " seconds." )
         print( "Class\tCount\tTime (seconds)\tOrigin\tLast Defined" )
         for i = 1, 100 do
             local sort = sorted[i]
