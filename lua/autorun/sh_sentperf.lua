@@ -36,7 +36,8 @@ concommand.Add( cmd, function( ply, _, args )
 
                 local info = lagTbl[perfID]
                 if not info then
-                    info = { class = ent:GetClass(), varName = varName, count = 0, time = 0, origin = entOrigin, linedefined = linedefined }
+                    local inCoroutine = coroutine.running()
+                    info = { class = ent:GetClass(), varName = varName, count = 0, time = 0, origin = entOrigin, linedefined = linedefined, inCoroutine = inCoroutine }
                     lagTbl[perfID] = info
                 end
 
@@ -82,7 +83,7 @@ concommand.Add( cmd, function( ply, _, args )
         for i = 1, 100 do
             local sort = sorted[i]
             if sort then
-                print( sort.class, sort.varName, sort.count, sort.time, sort.origin .. ":" .. sort.linedefined )
+                print( sort.class, sort.varName, sort.count, sort.time, sort.origin .. ":" .. sort.linedefined, sort.inCoroutine and "in coroutine, result may be inaccurate" or "" )
             end
         end
 
