@@ -12,16 +12,25 @@ local toWrap = {
     [wepMeta] = WEAPON_INDEX
 }
 
+local debug_getinfo = debug.getinfo
+
 local cmd = SERVER and "red_sv_indexcounter" or "red_cl_indexcounter"
 concommand.Add( cmd, function( ply, _, args )
-    if SERVER and IsValid( ply ) then return end
-    local time = tonumber( args[1] ) or 10
+    if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
+        return ply:ChatPrint( "No permission." )
+    end
 
+    local time = tonumber( args[1] ) or 10
     local origins = {}
 
     for meta, original in pairs( toWrap ) do
         meta.__index = function( tbl, key )
-            local info = debug.getinfo( 2 )
+            local info = debug_getinfo( 2 )
+
+            -- IsValid
+            if info.name == "IsValid" and info.short_src == "lua/includes/util.lua" then
+                info = debug_getinfo( 3 )
+            end
             local name = info.short_src .. ":" .. info.linedefined
             origins[name] = origins[name] and origins[name] + 1 or 1
 
@@ -29,7 +38,9 @@ concommand.Add( cmd, function( ply, _, args )
         end
     end
 
+    local startTime = SysTime()
     timer.Simple( time, function()
+        print( "Entity index profiling complete. Time taken: " .. ( SysTime() - startTime ) .. " seconds." )
         entMeta.__index = ENT_INDEX
         plyMeta.__index = PLAYER_INDEX
         wepMeta.__index = WEAPON_INDEX
