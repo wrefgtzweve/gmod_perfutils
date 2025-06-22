@@ -27,7 +27,7 @@ concommand.Add( cmd, function( ply, _, args )
             local originInfo = debug.getinfo( original, "S" )
             local perfID = ent:GetClass() .. ":" .. varName
             local entOrigin = originInfo.short_src
-            local entLastDefined = originInfo.lastlinedefined
+            local linedefined = originInfo.linedefined
 
             local function wrapper( ... )
                 local sysTime = SysTime()
@@ -36,7 +36,7 @@ concommand.Add( cmd, function( ply, _, args )
 
                 local info = lagTbl[perfID]
                 if not info then
-                    info = { class = ent:GetClass(), varName = varName, count = 0, time = 0, origin = entOrigin, lastDefined = entLastDefined }
+                    info = { class = ent:GetClass(), varName = varName, count = 0, time = 0, origin = entOrigin, linedefined = linedefined }
                     lagTbl[perfID] = info
                 end
 
@@ -82,7 +82,7 @@ concommand.Add( cmd, function( ply, _, args )
         for i = 1, 100 do
             local sort = sorted[i]
             if sort then
-                print( sort.class, sort.varName, sort.count, sort.time, sort.origin .. ":" .. sort.lastDefined )
+                print( sort.class, sort.varName, sort.count, sort.time, sort.origin .. ":" .. sort.linedefined )
             end
         end
 
