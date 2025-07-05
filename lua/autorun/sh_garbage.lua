@@ -44,6 +44,11 @@ concommand.Add( cmd, function( ply, _, args )
             table.insert( indexed, { origin = origin, count = count } )
         end
 
+        if #indexed == 0 then
+            print( "None of the tracked functions were called during the profiling period." )
+            return
+        end
+
         table.sort( indexed, function( a, b ) return a.count > b.count end )
 
         local max = 100
