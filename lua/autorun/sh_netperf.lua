@@ -11,7 +11,7 @@ local function applyWrap()
         local headerNum = net.ReadHeader()
         local strName = util.NetworkIDToString( headerNum )
 
-        net_ReadHeader = net.ReadHeader
+        net_ReadHeader = net_ReadHeader or net.ReadHeader
         net.ReadHeader = function()
             return headerNum
         end
@@ -85,4 +85,5 @@ concommand.Add( SERVER and "red_sv_netperf_stop" or "red_cl_netperf_stop", funct
     print( "Time ran: " .. ( SysTime() - totalStartTime ) .. "s" )
 
     net.Incoming = netperf_net_Incoming
+    net.ReadHeader = net_ReadHeader
 end )
