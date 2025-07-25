@@ -128,7 +128,7 @@ concommand.Add( cmd, function( ply, _, args )
             local v = sorted[i]
             if not v then break end
 
-            printer( ( v[2].isGM and "GM:" or "" ) .. v[1], v[2].hook, v[2].time, v[2].count, v[2].origin, v[2].lastDefined )
+            printer( ( v[2].isGM and "GM:" or "" ) .. tostring( v[1] ), v[2].hook, v[2].time, v[2].count, v[2].origin, v[2].lastDefined )
         end
 
         HOOK_PERF_ORIGINALS = nil
