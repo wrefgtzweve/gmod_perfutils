@@ -112,6 +112,9 @@ concommand.Add( cmd, function( ply, _, args )
             GM[methodName] = func
         end
 
+        HOOK_PERF_ORIGINALS = nil
+        HOOK_PERF_RUNNING = nil
+
         -- sort
         local sorted = {}
         for k, v in pairs( lagTbl ) do
@@ -130,8 +133,5 @@ concommand.Add( cmd, function( ply, _, args )
 
             printer( ( v[2].isGM and "GM:" or "" ) .. tostring( v[1] ), v[2].hook, v[2].time, v[2].count, v[2].origin, v[2].lastDefined )
         end
-
-        HOOK_PERF_ORIGINALS = nil
-        HOOK_PERF_RUNNING = nil
     end )
 end )
