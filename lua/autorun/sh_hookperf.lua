@@ -78,7 +78,7 @@ concommand.Add( cmd, function( ply, _, args )
 
                 local info = lagTbl[methodName]
                 if not info then
-                    info = { count = 0, time = 0, hook = "GM:" .. methodName, origin = originInfo.short_src, lastDefined = originInfo.lastlinedefined, isGM = true }
+                    info = { count = 0, time = 0, hook = methodName, origin = originInfo.short_src, lastDefined = originInfo.lastlinedefined, isGM = true }
                     lagTbl[methodName] = info
                 end
 
@@ -132,6 +132,37 @@ concommand.Add( cmd, function( ply, _, args )
             if not v then break end
 
             printer( ( v[2].isGM and "GM:" or "" ) .. tostring( v[1] ), v[2].hook, v[2].time, v[2].count, v[2].origin, v[2].lastDefined )
+        end
+
+
+        -- Add hook performance up per hookname
+        MsgC( softWhite, "\nLaggy hooks summed by hook name:\n" )
+        printer( "Name", "Hook", "Time", "Count", "Origin", "Line defined" )
+        local summed = {}
+        for _, v in pairs( lagTbl ) do
+            local info = summed[v.hook]
+            if not info then
+                info = { count = 0, time = 0, hook = v.hook, origin = v.origin, lastDefined = v.lastDefined, isGM = v.isGM }
+                summed[v.hook] = info
+            end
+            info.count = info.count + v.count
+            info.time = info.time + v.time
+        end
+
+        local sortedSummed = {}
+        for k, v in pairs( summed ) do
+            table.insert( sortedSummed, { k, v } )
+        end
+        table.sort( sortedSummed, function( a, b )
+            return a[2].time > b[2].time
+        end )
+
+        -- only print top 100
+        for i = 1, 100 do
+            local v = sortedSummed[i]
+            if not v then break end
+
+            MsgC( hookC, tostring( v[1] ), darkGray, " - ", timeC, math.Round( v[2].time, 6 ) .. "s", darkGray, " - ", countC, v[2].count .. " calls", "\n" )
         end
     end )
 end )
