@@ -29,7 +29,7 @@ local function applyWrap()
 end
 
 local nw2Table = {}
-hook.Add( "EntityNetworkedVarChanged", "NetPerf", function( ent, name, oldval, newval )
+hook.Add( "EntityNetworkedVarChanged", "NetPerf", function( _ent, name, _oldval, _newval )
     if not running then return end
 
     nw2Table[name] = ( nw2Table[name] or 0 ) + 1
@@ -37,7 +37,7 @@ end )
 
 concommand.Add( SERVER and "red_sv_netperf_start" or "red_cl_netperf_start", function( ply )
     if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
-        return ply:ChatPrint("No permission.")
+        return ply:ChatPrint( "No permission." )
     end
 
     totalStartTime = SysTime()
@@ -52,7 +52,7 @@ end )
 
 concommand.Add( SERVER and "red_sv_netperf_stop" or "red_cl_netperf_stop", function( ply )
     if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
-        return ply:ChatPrint("No permission.")
+        return ply:ChatPrint( "No permission." )
     end
 
     if not running then
