@@ -84,7 +84,7 @@ local function applyWrap()
         end
 
         if not ignoreNets[strName] then
-            MsgC( startColor, "NET START: ", realmColor, strName, blueColor, " (" .. len .. " bytes)", "\n" )
+            MsgC( startColor, "NET START: ", realmColor, strName, blueColor, " (" .. len .. " bits)", "\n" )
             wrapNetRead()
         end
 
@@ -143,4 +143,5 @@ concommand.Add( SERVER and "red_sv_netlogger_ignore" or "red_cl_netlogger_ignore
 
     ignoreNets[name] = true
     print( "Ignoring net message: " .. name )
+
 end )
