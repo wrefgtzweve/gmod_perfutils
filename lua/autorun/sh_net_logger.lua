@@ -143,5 +143,4 @@ concommand.Add( SERVER and "red_sv_netlogger_ignore" or "red_cl_netlogger_ignore
 
     ignoreNets[name] = true
     print( "Ignoring net message: " .. name )
-
 end )
