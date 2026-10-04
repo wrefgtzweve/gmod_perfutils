@@ -7,12 +7,44 @@ local pink = Color( 235, 52, 137 )
 
 local hookRanNum = 0
 
+-- support for srlion's hook library priorities
+local function GetInternalHooks()
+    if hook.Author ~= "Srlion" then return end
+    local i = 0
+
+    while true do
+        i = i + 1
+
+        local name, value = debug.getupvalue( hook.Call, i )
+        if not name then break end
+
+        if name == "events" then
+            return value
+        end
+    end
+end
+
+local function GetHookPriority( internalHooks, hookName, hookID )
+    if not internalHooks then return end
+
+    local event = internalHooks[hookName]
+    if not event then return end
+
+    local hookInfo = event[hookID]
+    if not hookInfo then return end
+
+    return hookInfo.priority
+end
+
 local function wrapHooks( hookTable, hookName, hookCount )
     hookRanNum = 0
+    local internalHooks = GetInternalHooks()
+
     for hookID, originalFunc in pairs( hookTable ) do
         local originInfo = debug.getinfo( originalFunc, "S" )
         local hookFuncOrigin = originInfo.short_src
         local hookFuncLastDefined = originInfo.lastlinedefined
+        local priority = GetHookPriority( internalHooks, hookName, hookID )
 
         local wrappedHook = function( ... )
             hookRanNum = hookRanNum + 1
@@ -40,10 +72,10 @@ local function wrapHooks( hookTable, hookName, hookCount )
                 MsgC( pink, "Done!\n" )
             end
 
-            hook.Add( hookName, hookID, originalFunc )
+            hook.Add( hookName, hookID, originalFunc, priority )
             return a, b, c, d, e, f
         end
-        hook.Add( hookName, hookID, wrappedHook )
+        hook.Add( hookName, hookID, wrappedHook, priority )
     end
 end
 

@@ -18,6 +18,23 @@ local function printer( ... )
     MsgC( unpack( order ) )
 end
 
+-- support for srlion's hook library priorities
+local function GetInternalHooks()
+    if hook.Author ~= "Srlion" then return end
+    local i = 0
+
+    while true do
+        i = i + 1
+
+        local name, value = debug.getupvalue( hook.Call, i )
+        if not name then break end
+
+        if name == "events" then
+            return value
+        end
+    end
+end
+
 local cmd = SERVER and "red_sv_hookperf" or "red_cl_hookperf"
 concommand.Add( cmd, function( ply, _, args )
     if SERVER and IsValid( ply ) and not ply:IsSuperAdmin() then
@@ -35,12 +52,20 @@ concommand.Add( cmd, function( ply, _, args )
     HOOK_PERF_ORIGINALS = HOOK_PERF_ORIGINALS or {}
     HOOK_PERF_RUNNING = true
 
+    local internalHooks = GetInternalHooks()
+
     for hookName, hookTable in pairs( hook.GetTable() ) do
         for hookEvent, hookFunc in pairs( hookTable ) do
-            HOOK_PERF_ORIGINALS[hookName] = HOOK_PERF_ORIGINALS[hookName] or {}
-            HOOK_PERF_ORIGINALS[hookName][hookEvent] = HOOK_PERF_ORIGINALS[hookName][hookEvent] or hookFunc
+            local priority
 
-            local originalFunc = HOOK_PERF_ORIGINALS[hookName][hookEvent]
+            if internalHooks and internalHooks[hookName] and internalHooks[hookName][hookEvent] then
+                priority = internalHooks[hookName][hookEvent].priority
+            end
+
+            HOOK_PERF_ORIGINALS[hookName] = HOOK_PERF_ORIGINALS[hookName] or {}
+            HOOK_PERF_ORIGINALS[hookName][hookEvent] = { func = hookFunc, priority = priority }
+
+            local originalFunc = hookFunc
             local originInfo = debug.getinfo( originalFunc, "S" )
             local hookFuncOrigin = originInfo.short_src
             local hookFuncLastDefined = originInfo.lastlinedefined
@@ -60,7 +85,7 @@ concommand.Add( cmd, function( ply, _, args )
                 return a, b, c, d, e, f
             end
 
-            hook.Add( hookName, hookEvent, wrapper )
+            hook.Add( hookName, hookEvent, wrapper, priority )
         end
     end
 
@@ -99,7 +124,7 @@ concommand.Add( cmd, function( ply, _, args )
                 if not orig then continue end
 
                 hook.Remove( hookName, hookEvent )
-                hook.Add( hookName, hookEvent, orig )
+                hook.Add( hookName, hookEvent, orig.func, orig.priority )
             end
         end
 
