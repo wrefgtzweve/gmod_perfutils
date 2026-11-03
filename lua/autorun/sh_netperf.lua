@@ -2,7 +2,6 @@ local perfTable = {}
 local bitTable = {}
 local countTable = {}
 local umsgTable = {}
-local umsgBitTable = {}
 local umsgCountTable = {}
 local totalStartTime = 0
 local running = false
@@ -16,12 +15,10 @@ local function applyWrap()
 
     usermessage.IncomingMessage = function( name, msg )
         if not running then return um_IncomingMessage( name, msg ) end
-        local bits = msg:GetNumBitsLeft()
         local start = SysTime()
         um_IncomingMessage( name, msg )
         local elapsed = SysTime() - start
         umsgTable[name] = ( umsgTable[name] or 0 ) + elapsed
-        umsgBitTable[name] = ( umsgBitTable[name] or 0 ) + bits
         umsgCountTable[name] = ( umsgCountTable[name] or 0 ) + 1
     end
 
@@ -64,7 +61,6 @@ concommand.Add( SERVER and "red_sv_netperf_start" or "red_cl_netperf_start", fun
     table.Empty( bitTable )
     table.Empty( countTable )
     table.Empty( umsgTable )
-    table.Empty( umsgBitTable )
     table.Empty( umsgCountTable )
     table.Empty( nw2Table )
 
@@ -133,15 +129,9 @@ concommand.Add( SERVER and "red_sv_netperf_stop" or "red_cl_netperf_stop", funct
 
     if next( umsgTable ) then
         MsgC( colHeader, "Usermessages sorted by time:\n" )
-        MsgC( colHeader, "Name", tab, "Time (s)", tab, "Bits", tab, "Count", "\n" )
+        MsgC( colHeader, "Name", tab, "Time (s)", tab, "Count", "\n" )
         for k, v in SortedPairsByValue( umsgTable, true ) do
-            MsgC( colCyan, k, colGray, tab, colGreen, tostring( math.Round( v, 6 ) ), colGray, tab, colYellow, tostring( umsgBitTable[k] or 0 ), colGray, tab, colWhite, tostring( umsgCountTable[k] or 0 ), colWhite, "\n" )
-        end
-
-        MsgC( colHeader, "\nUsermessages sorted by bits:\n" )
-        MsgC( colHeader, "Name", tab, "Bits", tab, "Time (s)", tab, "Count", "\n" )
-        for k, v in SortedPairsByValue( umsgBitTable, true ) do
-            MsgC( colCyan, k, colGray, tab, colYellow, tostring( v ), colGray, tab, colGreen, tostring( math.Round( umsgTable[k] or 0, 6 ) ), colGray, tab, colWhite, tostring( umsgCountTable[k] or 0 ), colWhite, "\n" )
+            MsgC( colCyan, k, colGray, tab, colGreen, tostring( math.Round( v, 6 ) ), colGray, tab, colWhite, tostring( umsgCountTable[k] or 0 ), colWhite, "\n" )
         end
 
         local totalUmsgCount, totalUmsgTime = 0, 0
@@ -149,12 +139,8 @@ concommand.Add( SERVER and "red_sv_netperf_stop" or "red_cl_netperf_stop", funct
             totalUmsgCount = totalUmsgCount + ( umsgCountTable[name] or 0 )
             totalUmsgTime = totalUmsgTime + time
         end
-        local totalUmsgBitCount = 0
-        for _, bits in pairs( umsgBitTable ) do
-            totalUmsgBitCount = totalUmsgBitCount + bits
-        end
 
-        MsgC( colHeader, "\nTotal usermessages: ", colWhite, tostring( totalUmsgCount ), colHeader, ", total time: ", colGreen, tostring( math.Round( totalUmsgTime, 6 ) ) .. "s", colHeader, ", total bits: ", colYellow, tostring( totalUmsgBitCount ), colWhite, "\n" )
+        MsgC( colHeader, "\nTotal usermessages: ", colWhite, tostring( totalUmsgCount ), colHeader, ", total time: ", colGreen, tostring( math.Round( totalUmsgTime, 6 ) ) .. "s", colWhite, "\n" )
     end
 
     net.Incoming = netperf_net_Incoming
